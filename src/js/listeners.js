@@ -569,10 +569,16 @@ class Listeners {
     this.bind(elements.buttons.restart, 'click', player.restart, 'restart');
 
     // Rewind
-    this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind');
+    this.bind(elements.buttons.rewind, 'click', () => {
+      player.lastSeekTime = Date.now();
+      player.rewind();
+    }, 'rewind');
 
     // Rewind
-    this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward');
+    this.bind(elements.buttons.fastForward, 'click', () => {
+      player.lastSeekTime = Date.now();
+      player.forward();
+    }, 'fastForward');
 
     // Mute toggle
     this.bind(
