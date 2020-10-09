@@ -1,7 +1,7 @@
 typeof navigator === "object" && (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define('Plyr', factory) :
-  (global = global || self, global.Plyr = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Plyr = factory());
 }(this, (function () { 'use strict';
 
   // Polyfill for creating CustomEvents on IE9/10/11
@@ -4408,7 +4408,7 @@ typeof navigator === "object" && (function (global, factory) {
     var checkIfURLSearchParamsSupported = function checkIfURLSearchParamsSupported() {
       try {
         var URLSearchParams = global.URLSearchParams;
-        return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function';
+        return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function' && typeof URLSearchParams.prototype.entries === 'function';
       } catch (e) {
         return false;
       }
@@ -4532,7 +4532,11 @@ typeof navigator === "object" && (function (global, factory) {
           anchorElement.href = anchorElement.href; // force href to refresh
         }
 
-        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+        var inputElement = doc.createElement('input');
+        inputElement.type = 'url';
+        inputElement.value = url;
+
+        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
           throw new TypeError('Invalid URL');
         }
 
@@ -11443,9 +11447,15 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-        this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+        this.bind(elements.buttons.rewind, 'click', function () {
+          player.lastSeekTime = Date.now();
+          player.rewind();
+        }, 'rewind'); // Rewind
 
-        this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+        this.bind(elements.buttons.fastForward, 'click', function () {
+          player.lastSeekTime = Date.now();
+          player.forward();
+        }, 'fastForward'); // Mute toggle
 
         this.bind(elements.buttons.mute, 'click', function () {
           player.muted = !player.muted;

@@ -4402,7 +4402,7 @@ function _nonIterableRest() {
   var checkIfURLSearchParamsSupported = function checkIfURLSearchParamsSupported() {
     try {
       var URLSearchParams = global.URLSearchParams;
-      return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function';
+      return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function' && typeof URLSearchParams.prototype.entries === 'function';
     } catch (e) {
       return false;
     }
@@ -4526,7 +4526,11 @@ function _nonIterableRest() {
         anchorElement.href = anchorElement.href; // force href to refresh
       }
 
-      if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+      var inputElement = doc.createElement('input');
+      inputElement.type = 'url';
+      inputElement.value = url;
+
+      if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
         throw new TypeError('Invalid URL');
       }
 
@@ -11437,9 +11441,15 @@ var Listeners = /*#__PURE__*/function () {
 
       this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-      this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+      this.bind(elements.buttons.rewind, 'click', function () {
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      }, 'rewind'); // Rewind
 
-      this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+      this.bind(elements.buttons.fastForward, 'click', function () {
+        player.lastSeekTime = Date.now();
+        player.forward();
+      }, 'fastForward'); // Mute toggle
 
       this.bind(elements.buttons.mute, 'click', function () {
         player.muted = !player.muted;

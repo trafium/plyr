@@ -5103,9 +5103,15 @@ var Listeners = /*#__PURE__*/function () {
 
       this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-      this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+      this.bind(elements.buttons.rewind, 'click', function () {
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      }, 'rewind'); // Rewind
 
-      this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+      this.bind(elements.buttons.fastForward, 'click', function () {
+        player.lastSeekTime = Date.now();
+        player.forward();
+      }, 'fastForward'); // Mute toggle
 
       this.bind(elements.buttons.mute, 'click', function () {
         player.muted = !player.muted;

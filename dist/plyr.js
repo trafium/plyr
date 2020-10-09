@@ -1,7 +1,7 @@
 typeof navigator === "object" && (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define('Plyr', factory) :
-  (global = global || self, global.Plyr = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Plyr = factory());
 }(this, (function () { 'use strict';
 
   function _classCallCheck(instance, Constructor) {
@@ -5109,9 +5109,15 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-        this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+        this.bind(elements.buttons.rewind, 'click', function () {
+          player.lastSeekTime = Date.now();
+          player.rewind();
+        }, 'rewind'); // Rewind
 
-        this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+        this.bind(elements.buttons.fastForward, 'click', function () {
+          player.lastSeekTime = Date.now();
+          player.forward();
+        }, 'fastForward'); // Mute toggle
 
         this.bind(elements.buttons.mute, 'click', function () {
           player.muted = !player.muted;
